@@ -1,0 +1,30 @@
+Bundled fonts
+=============
+
+The font files in this directory are unmodified copies of the upstream fonts (taken from the Debian /
+Ubuntu font packages). They are used by the PDF editor to draw text in the exported PDF and are also served
+to the browser (GET /api/fonts/files/<file>) so that the live preview uses exactly the same glyphs.
+
+Family          Licence      Copyright
+--------------  -----------  ------------------------------------------------------------------------
+Open Sans       Apache-2.0   Digitized data copyright (c) 2010-2011, Google Corporation.
+Roboto          Apache-2.0   Copyright 2015 Google Inc.
+Montserrat      OFL-1.1      Copyright 2011 The Montserrat Project Authors
+                             (https://github.com/JulietaUla/Montserrat)
+Carlito         OFL-1.1      Copyright (c) 2010-2013 by tyPoland Lukasz Dziedzic with Reserved Font Name
+                             "Carlito".
+Caladea         OFL-1.1      Copyright 2012 The Caladea Project Authors
+                             (https://github.com/huertatipografica/Caladea)
+Courier Prime   OFL-1.1      Copyright 2015 Quote-Unquote Apps
+                             (https://github.com/quoteunquoteapps/CourierPrime)
+Dancing Script  OFL-1.1      Copyright (c) 2010, Pablo Impallari (www.impallari.com|impallari@gmail.com),
+                             Copyright (c) 2010, Igino Marini (www.ikern.com|mail@iginomarini.com),
+                             with Reserved Font Name Dancing Script.
+Comic Neue      OFL-1.1      Copyright 2014-2016 Craig Rozynski (https://github.com/crozynski/comicneue)
+
+The Apache License 2.0 is in LICENSE-Apache-2.0.txt, the SIL Open Font License 1.1 in LICENSE-OFL-1.1.txt.
+The fonts are not sold by themselves; the licences do not apply to PDF documents created with them.
+
+To add a family, put its static TTF/OTF files here, keep its licence text next to them and declare it in
+com.example.pdfeditor.service.FontCatalog. Variable fonts are not supported (the PDF library embeds only the
+default instance), so use static Regular / Bold / Italic / Bold Italic files.

@@ -1,0 +1,862 @@
+:root {
+  --accent: #1a73e8;
+  --accent-soft: rgba(26, 115, 232, 0.12);
+  --danger: #d93025;
+  --border: #d0d7de;
+  --text: #1f2328;
+  --muted: #656d76;
+}
+
+/* Always reserve the scrollbar so the page width (and the "Fit" zoom) does not change when it appears. */
+html {
+  overflow-y: scroll;
+}
+
+.app {
+  min-height: 100vh;
+  background: #e6e9ed;
+  color: var(--text);
+}
+
+/* ---------- toolbar ---------- */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  padding: 8px 16px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.tool-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #f6f8fa;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  background: #eaeef2;
+}
+
+.btn:focus-visible,
+.bar-button:focus-visible,
+.banner-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: #0b57d0;
+  font-weight: 600;
+}
+
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: #1765cc;
+}
+
+.btn.large {
+  padding: 10px 22px;
+  font-size: 1rem;
+}
+
+.color-input {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+.zoom-level {
+  min-width: 3.2em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+}
+
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding: 4px 16px 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.doc-info {
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.banner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 16px 8px;
+  padding: 8px 12px;
+  border: 1px solid;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.banner ul {
+  margin: 4px 0 0;
+  padding-left: 20px;
+}
+
+.banner.error {
+  background: #fdecea;
+  border-color: #f5b5af;
+  color: #8c1d18;
+}
+
+.banner.warning {
+  background: #fff4ce;
+  border-color: #f1d36b;
+  color: #6b4e00;
+}
+
+.banner.success {
+  background: #e6f4ea;
+  border-color: #a8d5b5;
+  color: #14532d;
+}
+
+.banner.info {
+  background: #e8f0fe;
+  border-color: #b4cdfa;
+  color: #174ea6;
+}
+
+.banner-close {
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* ---------- workspace ---------- */
+
+.workspace {
+  min-height: 60vh;
+}
+
+.pages {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.empty-state {
+  max-width: 520px;
+  margin: 12vh auto 0;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.empty-state h2 {
+  margin: 0 0 8px;
+}
+
+.empty-state p {
+  margin: 0 0 20px;
+  color: var(--muted);
+}
+
+.empty-state .muted {
+  margin: 14px 0 0;
+  font-size: 0.9rem;
+}
+
+.drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 115, 232, 0.18);
+  border: 4px dashed var(--accent);
+  color: #0b57d0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* ---------- pages ---------- */
+
+/* The pages are centred with auto margins (not flex centring), so wide pages scroll instead of being clipped. */
+.page {
+  position: relative;
+  flex: none;
+  margin-inline: auto;
+  background: #fff;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+  /* A stacking context of its own: highlights blend with the page only, never with what is behind it. */
+  isolation: isolate;
+}
+
+.page-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+}
+
+.page-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9aa0a6;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+.page-status.error {
+  color: var(--danger);
+}
+
+.edit-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.page-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+}
+
+.page-overlay[data-tool='erase'],
+.page-overlay[data-tool='highlight'],
+.page-overlay[data-tool='image'] {
+  touch-action: none;
+}
+
+.hover-outline {
+  fill: rgba(26, 115, 232, 0.08);
+  stroke: var(--accent);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.hover-outline.erase {
+  fill: rgba(217, 48, 37, 0.1);
+  stroke: var(--danger);
+}
+
+.hover-outline.highlight {
+  fill: rgba(250, 204, 21, 0.3);
+  stroke: #ca8a04;
+}
+
+.band {
+  fill: rgba(26, 115, 232, 0.12);
+  stroke: var(--accent);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.band.erase {
+  fill: rgba(217, 48, 37, 0.14);
+  stroke: var(--danger);
+}
+
+.band.highlight {
+  fill: rgba(250, 204, 21, 0.35);
+  stroke: #ca8a04;
+}
+
+.image-ghost {
+  pointer-events: none;
+}
+
+/* ---------- selection frame ---------- */
+
+/* The frame lets the pointer through to the block under it; only its border strips and handles take it. */
+.selection-frame {
+  position: absolute;
+  z-index: 4;
+  box-sizing: border-box;
+  outline: 1.5px solid var(--accent);
+  outline-offset: -1px;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+}
+
+.selection-frame.editing {
+  outline-style: dashed;
+}
+
+.frame-border,
+.frame-grip,
+.frame-rotate,
+.frame-handle {
+  position: absolute;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+/* Strips along the outline, mostly outside it, so that the text inside stays clickable. */
+.frame-border {
+  cursor: move;
+}
+
+.frame-border.top {
+  top: -7px;
+  left: -7px;
+  right: -7px;
+  height: 10px;
+}
+
+.frame-border.bottom {
+  bottom: -7px;
+  left: -7px;
+  right: -7px;
+  height: 10px;
+}
+
+.frame-border.left {
+  top: -7px;
+  bottom: -7px;
+  left: -7px;
+  width: 10px;
+}
+
+.frame-border.right {
+  top: -7px;
+  bottom: -7px;
+  right: -7px;
+  width: 10px;
+}
+
+.frame-grip {
+  left: -1px;
+  bottom: -24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 22px;
+  border-radius: 0 0 5px 5px;
+  background: var(--accent);
+  color: #fff;
+  cursor: move;
+}
+
+.frame-grip svg {
+  fill: currentColor;
+}
+
+.frame-stem {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  width: 0;
+  height: 22px;
+  border-left: 1.5px solid var(--accent);
+  pointer-events: none;
+}
+
+.frame-rotate {
+  top: -38px;
+  left: calc(50% - 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--accent);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--accent);
+  cursor: grab;
+}
+
+.frame-rotate:active {
+  cursor: grabbing;
+}
+
+.frame-rotate svg {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.frame-handle {
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--accent);
+  border-radius: 2px;
+  background: #fff;
+}
+
+/* A bigger target than the handle that is drawn. */
+.frame-handle::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+}
+
+.frame-handle.nw { top: -5px; left: -5px; }
+.frame-handle.ne { top: -5px; right: -5px; }
+.frame-handle.se { bottom: -5px; right: -5px; }
+.frame-handle.sw { bottom: -5px; left: -5px; }
+
+.frame-handle.n,
+.frame-handle.s {
+  left: calc(50% - 9px);
+  width: 18px;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.frame-handle.n { top: -4px; }
+.frame-handle.s { bottom: -4px; }
+
+.frame-handle.e,
+.frame-handle.w {
+  top: calc(50% - 9px);
+  width: 8px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.frame-handle.e { right: -4px; }
+.frame-handle.w { left: -4px; }
+
+.frame-angle {
+  position: absolute;
+  z-index: 7;
+  transform: translateX(-50%);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(31, 35, 40, 0.85);
+  color: #fff;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.guide-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.guide-lines line {
+  stroke: #e8336d;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+/* ---------- inline text editor ---------- */
+
+.inline-editor {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.editor-cover {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* The point where the first line of the text starts, turned with the text. */
+.editor-anchor {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+}
+
+.editor-text {
+  position: absolute;
+  left: 0;
+  display: block;
+  box-sizing: content-box;
+  min-width: 2px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  resize: none;
+  overflow: hidden;
+  pointer-events: auto;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.editor-text::selection {
+  background: rgba(26, 115, 232, 0.3);
+}
+
+/* ---------- format bar ---------- */
+
+.format-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  padding: 6px 16px;
+  border-top: 1px solid #eaeef2;
+  background: #fafbfc;
+  font-size: 0.85rem;
+}
+
+.format-title {
+  min-width: 5.5em;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.bar-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bar-actions {
+  margin-left: auto;
+}
+
+.bar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 30px;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.bar-button:hover:not(:disabled) {
+  background: #eaeef2;
+}
+
+.bar-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.bar-button[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: #0b57d0;
+}
+
+.bar-button.danger {
+  color: var(--danger);
+}
+
+.bar-button.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+.bar-button.primary:hover:not(:disabled) {
+  background: #1765cc;
+}
+
+.bar-button.style-b { font-weight: 700; }
+.bar-button.style-i { font-style: italic; font-family: Georgia, serif; }
+.bar-button.style-u { text-decoration: underline; }
+.bar-button.style-s { text-decoration: line-through; }
+
+.format-bar select,
+.number-field input,
+.hex-input {
+  height: 30px;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+}
+
+.format-bar select:focus-visible,
+.number-field input:focus-visible,
+.hex-input:focus-visible,
+.opacity-control input:focus-visible,
+.popover:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.size-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.number-field {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.number-field input {
+  width: 52px;
+  padding: 0 6px;
+  text-align: center;
+}
+
+.rotation-field input {
+  padding-right: 14px;
+}
+
+.number-field .suffix {
+  position: absolute;
+  right: 6px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+/* Only the arrow of the preset list shows; the size itself is in the field next to it. */
+.size-presets {
+  width: 22px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.line-height {
+  padding: 0 4px;
+}
+
+.opacity-control {
+  gap: 6px;
+}
+
+.opacity-control input {
+  width: 90px;
+  accent-color: var(--accent);
+}
+
+.control-label {
+  color: var(--muted);
+}
+
+.control-value {
+  min-width: 3em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- pickers ---------- */
+
+.picker {
+  position: relative;
+}
+
+.picker-button {
+  justify-content: space-between;
+}
+
+.font-picker .picker-button {
+  width: 170px;
+}
+
+.picker-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  color: var(--muted);
+  font-size: 0.75em;
+}
+
+.color-chip {
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 40;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+.font-list {
+  width: 240px;
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+  padding: 4px 0;
+  outline: 0;
+}
+
+.font-group {
+  padding: 8px 12px 4px;
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.font-option {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.font-option.active {
+  background: var(--accent-soft);
+}
+
+.font-option .check {
+  color: var(--accent);
+  font-family: system-ui, sans-serif;
+}
+
+.color-popover {
+  width: 196px;
+  padding: 10px;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+.swatch {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.swatch.current {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.swatch:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+}
+
+.popover-heading {
+  margin: 10px 0 6px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.color-custom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.color-custom input[type='color'] {
+  width: 34px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+.hex-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0 8px;
+  font-family: ui-monospace, monospace;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn,
+  .bar-button {
+    transition: background-color 0.12s;
+  }
+}
