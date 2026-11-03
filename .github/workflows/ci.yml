@@ -31,11 +31,11 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: frontend
-        run: npm ci --prefix frontend
+        run: npm ci
 
       - name: Run frontend unit tests
         working-directory: frontend
-        run: npm test --prefix frontend -- --watchAll=false --runInBand
+        run: npm test -- --watchAll=false --runInBand
         env:
           CI: true
           NODE_OPTIONS: --max-old-space-size=3072
